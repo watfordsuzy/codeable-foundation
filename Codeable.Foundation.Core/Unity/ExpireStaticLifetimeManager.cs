@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Practices.Unity;
+using Unity;
+using Unity.Lifetime;
 using System.Web;
 using System.Diagnostics;
 using Codeable.Foundation.Core.System;
 using Codeable.Foundation.Common.System;
 using System.Collections.Concurrent;
-using Microsoft.Practices.ObjectBuilder2;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Codeable.Foundation.Core.Unity
 {
-    public class ExpireStaticLifetimeManager : LifetimeManager
+    public class ExpireStaticLifetimeManager : LifetimeManager, ITypeLifetimeManager
     {
         public ExpireStaticLifetimeManager(string globalKey, TimeSpan lifeSpan, bool renewOnAccess = false)
         {
@@ -117,8 +117,7 @@ namespace Codeable.Foundation.Core.Unity
                 }
                 return Single<ConcurrentDictionary<string, ExpireStaticValue>>.Instance;
             }
-        }
-        
+        }        
 
         public bool HasExpired()
         {
@@ -142,7 +141,13 @@ namespace Codeable.Foundation.Core.Unity
             }
             return true;
         }
-        public override object GetValue()
+
+        protected override LifetimeManager OnCreateLifetimeManager()
+        {
+            return this;
+        }
+
+        public override object GetValue(ILifetimeContainer container = null)
         {
             object result = null;
             ExpireStaticValue value = null;
@@ -171,7 +176,7 @@ namespace Codeable.Foundation.Core.Unity
             }
             return result;
         }
-        public override void RemoveValue()
+        public override void RemoveValue(ILifetimeContainer container = null)
         {
             ExpireStaticValue found = null;
 
@@ -196,7 +201,7 @@ namespace Codeable.Foundation.Core.Unity
                 catch { } // gulp
             }
         }
-        public override void SetValue(object newValue)
+        public override void SetValue(object newValue, ILifetimeContainer container = null)
         {
             ExpireStaticValue old = null;
 

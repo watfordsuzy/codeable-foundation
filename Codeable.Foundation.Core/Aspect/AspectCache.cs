@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using Codeable.Foundation.Core.Aspect;
 using Codeable.Foundation.Common;
-using Microsoft.Practices.Unity;
+using Unity;
+using Unity.Lifetime;
 using Codeable.Foundation.Common.Aspect;
 using System.Threading;
 using System.Collections.Concurrent;
-using Codeable.Foundation.Core.Unity;
 
 namespace Codeable.Foundation.Core.Caching
 {

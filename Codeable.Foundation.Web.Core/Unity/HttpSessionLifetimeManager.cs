@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Practices.Unity;
+using Unity;
+using Unity.Lifetime;
 using System.Web;
 using System.Diagnostics;
 
 namespace Codeable.Foundation.UI.Web.Core.Unity
 {
-    public class HttpSessionLifetimeManager : LifetimeManager
+    public class HttpSessionLifetimeManager : LifetimeManager, ITypeLifetimeManager
     {
         public HttpSessionLifetimeManager(string sessionKey)
         {
@@ -17,7 +18,12 @@ namespace Codeable.Foundation.UI.Web.Core.Unity
 
         protected string SessionKey { get; set; }
 
-        public override object GetValue()
+        protected override LifetimeManager OnCreateLifetimeManager()
+        {
+            return this;
+        }
+
+        public override object GetValue(ILifetimeContainer container = null)
         {
             if ((HttpContext.Current != null) && (HttpContext.Current.Session != null))
             {
@@ -29,14 +35,14 @@ namespace Codeable.Foundation.UI.Web.Core.Unity
             }
             return null;
         }
-        public override void RemoveValue()
+        public override void RemoveValue(ILifetimeContainer container = null)
         {
             if ((HttpContext.Current != null) && (HttpContext.Current.Session != null))
             {
                 HttpContext.Current.Session.Remove(GenerateSessionKey());
             }
         }
-        public override void SetValue(object newValue)
+        public override void SetValue(object newValue, ILifetimeContainer container = null)
         {
             if ((HttpContext.Current != null) && (HttpContext.Current.Session != null))
             {

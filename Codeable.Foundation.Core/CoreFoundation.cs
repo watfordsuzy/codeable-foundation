@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
 using Codeable.Foundation.Core.System;
-using Microsoft.Practices.Unity;
+using Unity;
 using Codeable.Foundation.Common;
 using Codeable.Foundation.Common.System;
 using Codeable.Foundation.Common.Aspect;
@@ -15,6 +15,7 @@ using System.Diagnostics;
 using Codeable.Foundation.Core.Caching;
 using Codeable.Foundation.Common.Daemons;
 using Codeable.Foundation.Core.Daemons;
+using Unity.Lifetime;
 
 namespace Codeable.Foundation.Core
 {
@@ -262,6 +263,7 @@ namespace Codeable.Foundation.Core
                 return default(T);
             }
         }
+
         public T SafeResolve<T>(string name)
         {
             try
@@ -275,69 +277,7 @@ namespace Codeable.Foundation.Core
             }
         }
 
-        /// <summary>
-        /// Replaces a unity registration with simple mechanisms. [no custom lifetime invocation, etc]
-        /// </summary>
-        public void RegisterTypeWithRollback<TInterface, TNewConcrete>(string token, bool allowSelfChained, LifetimeManager lifetimeManager)
-            where TNewConcrete : TInterface
-        {
-            PreviousRegistration result = null;
-            TInterface iPreviousConcrete = this.SafeResolve<TInterface>();
-
-            if (iPreviousConcrete != null)
-            {
-                if (allowSelfChained || (iPreviousConcrete.GetType() != typeof(TNewConcrete)))
-                {
-                    // get previous
-                    result = new PreviousRegistration();
-                    result.ConcreteType = iPreviousConcrete.GetType();
-                    var registration = this.Container.Registrations.FirstOrDefault(r => r.RegisteredType == typeof(TInterface));
-                    if (registration != null)
-                    {
-                        result.LifetimeManagerType = registration.LifetimeManagerType;
-                    }
-                    else
-                    {
-                        result.LifetimeManagerType = null;
-                    }
-                }
-            }
-
-            if((result != null) && !string.IsNullOrEmpty(token))
-            {
-                SingleDictionary<string, PreviousRegistration>.Instance[token] = result;
-            }
-
-            this.Container.RegisterType<TInterface, TNewConcrete>(lifetimeManager);
-        }
-
-        public void RollbackRegisterType<TInterface>(string token)
-        {
-            PreviousRegistration previousRegistration = null;
-            if (SingleDictionary<string, PreviousRegistration>.Instance.TryGetValue(token, out previousRegistration) && (previousRegistration != null))
-            {
-                // reset history
-                SingleDictionary<string, PreviousRegistration>.Instance.Remove(token);
-
-                // safety
-                if (previousRegistration.LifetimeManagerType == null)
-                {
-                    previousRegistration.LifetimeManagerType = typeof(ContainerControlledLifetimeManager);
-                }
-
-                // register
-                Container.RegisterType(typeof(TInterface), previousRegistration.ConcreteType, (LifetimeManager)this.Container.Resolve(previousRegistration.LifetimeManagerType));
-            }
-        }
-
         #endregion
-
-        internal class PreviousRegistration
-        {
-            public Type ConcreteType { get; set; }
-            public Type LifetimeManagerType { get; set; }
-        }
-
     }
     
 }

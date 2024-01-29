@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Practices.Unity;
+using Unity;
+using Unity.Lifetime;
 using System.Web;
 using System.Diagnostics;
 using Codeable.Foundation.Core.System;
@@ -12,7 +13,7 @@ using System.Collections.Concurrent;
 
 namespace Codeable.Foundation.Core.Unity
 {
-    public class StaticLifetimeManager : LifetimeManager
+    public class StaticLifetimeManager : LifetimeManager, ITypeLifetimeManager
     {
         public StaticLifetimeManager(string globalKey)
         {
@@ -49,7 +50,7 @@ namespace Codeable.Foundation.Core.Unity
             }
         }
 
-        public override object GetValue()
+        public override object GetValue(ILifetimeContainer container = null)
         {
             object result = null;
 
@@ -73,7 +74,7 @@ namespace Codeable.Foundation.Core.Unity
 
             return result;
         }
-        public override void RemoveValue()
+        public override void RemoveValue(ILifetimeContainer container = null)
         {
             StaticValue found = null;
 
@@ -98,7 +99,7 @@ namespace Codeable.Foundation.Core.Unity
                 catch { } // gulp
             }
         }
-        public override void SetValue(object newValue)
+        public override void SetValue(object newValue, ILifetimeContainer container = null)
         {
             StaticValue old = null;
 
@@ -135,6 +136,10 @@ namespace Codeable.Foundation.Core.Unity
             
         }
 
+        protected override LifetimeManager OnCreateLifetimeManager()
+        {
+            return this;
+        }
 
         public class StaticValue : IDisposable
         {

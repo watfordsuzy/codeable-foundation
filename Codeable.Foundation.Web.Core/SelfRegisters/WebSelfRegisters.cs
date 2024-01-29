@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Codeable.Foundation.UI.Web.Core.MVC;
-using Microsoft.Practices.Unity;
+using Unity;
+using Unity.Lifetime;
 using Codeable.Foundation.Common.System;
 using Codeable.Foundation.UI.Web.Core.MVC.Embedded;
 using System.Web;
@@ -18,7 +19,7 @@ namespace Codeable.Foundation.UI.Web.Core.SelfRegisters
     {
         #region IDynamicallySelfRegisterWithUnity Members
 
-        public void SelfRegister(Microsoft.Practices.Unity.IUnityContainer container)
+        public void SelfRegister(IUnityContainer container)
         {
             container.RegisterType<IWebPluginLoader, WebPluginLoader>(new ContainerControlledLifetimeManager());
             container.RegisterType<IWebPluginEmbeddedItemFinder, WebPluginEmbeddedItemFinder>(new ContainerControlledLifetimeManager());

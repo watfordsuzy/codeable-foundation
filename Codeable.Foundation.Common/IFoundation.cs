@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Practices.Unity;
 using Codeable.Foundation.Common.Aspect;
 using Codeable.Foundation.Common.Plugins;
 using Codeable.Foundation.Common.System;
 using Codeable.Foundation.Common.Daemons;
+using Unity;
+using Unity.Lifetime;
 
 namespace Codeable.Foundation.Common
 {
@@ -23,8 +24,5 @@ namespace Codeable.Foundation.Common
 
         T SafeResolve<T>();
         T SafeResolve<T>(string name);
-
-        void RegisterTypeWithRollback<TInterface, TNewConcrete>(string token, bool allowSelfChained, LifetimeManager lifetimeManager) where TNewConcrete : TInterface;
-        void RollbackRegisterType<TInterface>(string token);
     }
 }

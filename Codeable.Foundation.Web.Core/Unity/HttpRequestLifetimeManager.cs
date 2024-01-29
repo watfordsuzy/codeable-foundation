@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Practices.Unity;
+using Unity;
+using Unity.Lifetime;
 using System.Web;
 using System.Diagnostics;
 
 namespace Codeable.Foundation.UI.Web.Core.Unity
 {
-    public class HttpRequestLifetimeManager : LifetimeManager
+    public class HttpRequestLifetimeManager : LifetimeManager, ITypeLifetimeManager
     {
         private string _key = Guid.NewGuid().ToString();
 
-        public override object GetValue()
+        protected override LifetimeManager OnCreateLifetimeManager()
+        {
+            return this;
+        }
+
+        public override object GetValue(ILifetimeContainer container = null)
         {
             if (HttpContext.Current != null)
             {
@@ -25,7 +31,7 @@ namespace Codeable.Foundation.UI.Web.Core.Unity
             return null;
         }
 
-        public override void RemoveValue()
+        public override void RemoveValue(ILifetimeContainer container = null)
         {
             if (HttpContext.Current != null)
             {
@@ -33,7 +39,7 @@ namespace Codeable.Foundation.UI.Web.Core.Unity
             }
         }
 
-        public override void SetValue(object newValue)
+        public override void SetValue(object newValue, ILifetimeContainer container = null)
         {
             if (HttpContext.Current != null)
             {

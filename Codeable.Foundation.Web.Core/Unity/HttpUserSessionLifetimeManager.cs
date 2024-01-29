@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Practices.Unity;
+using Unity;
+using Unity.Lifetime;
 using System.Web;
 using System.Diagnostics;
 
 namespace Codeable.Foundation.UI.Web.Core.Unity
 {
-    public class HttpUserSessionLifetimeManager : HttpSessionLifetimeManager
+    public class HttpUserSessionLifetimeManager : HttpSessionLifetimeManager, ITypeLifetimeManager
     {
         public HttpUserSessionLifetimeManager(string sessionKey)
             : base (sessionKey)
